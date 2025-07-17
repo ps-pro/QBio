@@ -1,0 +1,1 @@
+# NEQR/FRQI quantum encoders
