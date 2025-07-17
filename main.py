@@ -79,10 +79,7 @@ def main():
             CONFIG['n_trials']
         )
 
-        # Create all plots
-        stat_analyzer.plot_correlation_analysis()
-        stat_analyzer.plot_gc_content_heatmap()
-        stat_analyzer.plot_3d_performance_surface()
+        # Only this line needed - it now calls all 4 new plot methods internally
         stat_analyzer.save_comprehensive_results()
 
         print("✅ Enhanced statistical analysis completed!")
