@@ -7,6 +7,9 @@ __pycache__/
 # C extensions
 *.so
 
+
+Debug_Notebooks/
+
 # Distribution / packaging
 .Python
 build/

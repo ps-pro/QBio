@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 
 # CPU optimization settings
 CPU_COUNT = mp.cpu_count()
-MAX_WORKERS = CPU_COUNT  # ✅ USE ALL 16 CORES!
-print(f"💻 CPU Cores Available: {CPU_COUNT}")
-print(f"🔥 Max Workers: {MAX_WORKERS} (using ALL cores)")
+MAX_WORKERS = CPU_COUNT
+print(f"CPU Cores Available: {CPU_COUNT}")
+print(f"Max Workers: {MAX_WORKERS} (using ALL cores)")
 
 # ENHANCED CONFIGURATION
 CONFIG = {
@@ -28,6 +28,19 @@ CONFIG = {
     'scaling_sequences': 15,
     'figure_dpi': 600,
     'random_seed': 42,
+    
+    # Noise analysis specific parameters
+    'noise_trials': 15,
+    'noise_sequence_length': 6,
+    'noise_gc_levels': [0.2, 0.5, 0.8],
+    'default_noise_levels': [
+        {'depolarizing': 0.0},
+        {'depolarizing': 0.001},
+        {'depolarizing': 0.005},
+        {'depolarizing': 0.001, 'amplitude_damping': 0.001},
+        {'depolarizing': 0.001, 'phase_damping': 0.001},
+        {'depolarizing': 0.001, 'amplitude_damping': 0.001, 'phase_damping': 0.001}
+    ]
 }
 
 # MASTER SEED MANAGEMENT
@@ -35,8 +48,9 @@ ANALYSIS_SEEDS = {
     'diversity': 42,
     'statistical': 84,
     'scaling': 126,
-    'numpy': 168,
-    'quantum_circuits': 210
+    'noise': 168,
+    'numpy': 210,
+    'quantum_circuits': 252
 }
 
 # DISTINCT IBM COLORS FOR GC LEVELS
@@ -60,6 +74,11 @@ IBM_COLORS = {
     'Axis_Labels': '#525252', # IBM Gray 70
     'Grid': '#e0e0e0',       # IBM Gray 20
     'Background': '#ffffff',  # White
+    
+    # Noise analysis colors
+    'Noise': '#d62728',       # Red for noise indicators
+    'No_Noise': '#2ca02c',    # Green for no noise baseline
+    'High_Noise': '#ff7f0e',  # Orange for high noise
 }
 
 # Minimalistic matplotlib settings

@@ -56,7 +56,7 @@ class QuantumDNAVisualizer:
         plt.tight_layout()
         plt.savefig('results/figures/diversity_comparison_enhanced.pdf',
                    dpi=CONFIG['figure_dpi'], bbox_inches='tight')
-        plt.show()
+        
 
     @staticmethod
     def plot_clean_correlation_analysis(results_df):
@@ -144,7 +144,7 @@ class QuantumDNAVisualizer:
         plt.tight_layout()
         plt.savefig('results/figures/correlation_panels_enhanced.pdf',
                    dpi=CONFIG['figure_dpi'], bbox_inches='tight')
-        plt.show()
+        
 
     @staticmethod
     def plot_performance_by_gc_content(results_df):
@@ -224,7 +224,7 @@ class QuantumDNAVisualizer:
         plt.tight_layout()
         plt.savefig('results/figures/performance_by_gc_enhanced.pdf',
                    dpi=CONFIG['figure_dpi'], bbox_inches='tight')
-        plt.show()
+        
 
     @staticmethod
     def plot_performance_distributions(results_df):
@@ -290,7 +290,7 @@ class QuantumDNAVisualizer:
         plt.tight_layout()
         plt.savefig('results/figures/distribution_comparison_enhanced.pdf',
                    dpi=CONFIG['figure_dpi'], bbox_inches='tight')
-        plt.show()
+        
 
     @staticmethod
     def plot_gc_content_trends(results_df):
@@ -372,7 +372,7 @@ class QuantumDNAVisualizer:
         plt.tight_layout()
         plt.savefig('results/figures/gc_trends_enhanced.pdf',
                    dpi=CONFIG['figure_dpi'], bbox_inches='tight')
-        plt.show()
+        
 
     @staticmethod
     def plot_scaling_results(results_df):
@@ -468,7 +468,7 @@ class QuantumDNAVisualizer:
         plt.tight_layout()
         plt.savefig('results/figures/scaling_analysis_enhanced.pdf',
                    dpi=CONFIG['figure_dpi'], bbox_inches='tight')
-        plt.show()
+        
 
     @staticmethod
     def plot_noise_resilience(results_df):
@@ -476,25 +476,25 @@ class QuantumDNAVisualizer:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
 
         # Group data for plotting
-        grouped = results_df.groupby(['depolarizing_rate', 'gc_content']).agg({
-            'neqr_error_mean': ['mean', 'std'],
-            'frqi_error_mean': ['mean', 'std']
-        })
-
-        # NEQR plot
         gc_levels = sorted(results_df['gc_content'].unique())
-        for gc in gc_levels:
+        
+        # NEQR plot
+        for i, gc in enumerate(gc_levels):
             gc_data = results_df[results_df['gc_content'] == gc]
             noise_grouped = gc_data.groupby('depolarizing_rate').agg({
                 'neqr_error_mean': ['mean', 'std']
             })
             
-            noise_rates = noise_grouped.index.values
-            errors = noise_grouped[('neqr_error_mean', 'mean')].values
-            error_stds = noise_grouped[('neqr_error_mean', 'std')].values
+            if len(noise_grouped) > 0:
+                noise_rates = noise_grouped.index.values
+                errors = noise_grouped[('neqr_error_mean', 'mean')].values
+                error_stds = noise_grouped[('neqr_error_mean', 'std')].values
 
-            ax1.errorbar(noise_rates, errors, yerr=error_stds,
-                        marker='o', label=f'GC={gc:.1f}', linewidth=2, markersize=6)
+                # Use different GC colors for each level
+                color = list(IBM_COLORS.values())[i % len(IBM_COLORS)]
+                ax1.errorbar(noise_rates, errors, yerr=error_stds,
+                            marker='o', label=f'GC={gc:.1f}', linewidth=2, markersize=6,
+                            color=color)
 
         apply_minimalistic_style(ax1,
                                title='NEQR Noise Resilience',
@@ -504,18 +504,22 @@ class QuantumDNAVisualizer:
         ax1.legend(frameon=False)
 
         # FRQI plot
-        for gc in gc_levels:
+        for i, gc in enumerate(gc_levels):
             gc_data = results_df[results_df['gc_content'] == gc]
             noise_grouped = gc_data.groupby('depolarizing_rate').agg({
                 'frqi_error_mean': ['mean', 'std']
             })
             
-            noise_rates = noise_grouped.index.values
-            errors = noise_grouped[('frqi_error_mean', 'mean')].values
-            error_stds = noise_grouped[('frqi_error_mean', 'std')].values
+            if len(noise_grouped) > 0:
+                noise_rates = noise_grouped.index.values
+                errors = noise_grouped[('frqi_error_mean', 'mean')].values
+                error_stds = noise_grouped[('frqi_error_mean', 'std')].values
 
-            ax2.errorbar(noise_rates, errors, yerr=error_stds,
-                        marker='s', label=f'GC={gc:.1f}', linewidth=2, markersize=6)
+                # Use different GC colors for each level
+                color = list(IBM_COLORS.values())[i % len(IBM_COLORS)]
+                ax2.errorbar(noise_rates, errors, yerr=error_stds,
+                            marker='s', label=f'GC={gc:.1f}', linewidth=2, markersize=6,
+                            color=color)
 
         apply_minimalistic_style(ax2,
                                title='FRQI Noise Resilience',
@@ -527,12 +531,12 @@ class QuantumDNAVisualizer:
         plt.tight_layout()
         plt.savefig('results/figures/noise_resilience_enhanced.pdf',
                    dpi=CONFIG['figure_dpi'], bbox_inches='tight')
-        plt.show()
+        
 
     @staticmethod
     def plot_noise_type_comparison(results_df):
         """Compare different types of noise"""
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(12, 8))
 
         # Group by noise configuration
         noise_grouped = results_df.groupby('noise_config').agg({
@@ -540,21 +544,30 @@ class QuantumDNAVisualizer:
             'frqi_error_mean': ['mean', 'std']
         })
 
+        if len(noise_grouped) == 0:
+            print("No noise data to plot")
+            return
+
         noise_configs = noise_grouped.index
         x = np.arange(len(noise_configs))
         width = 0.35
 
         # Plot bars
-        ax.bar(x - width/2, noise_grouped[('neqr_error_mean', 'mean')], width,
-               yerr=noise_grouped[('neqr_error_mean', 'std')],
+        neqr_errors = noise_grouped[('neqr_error_mean', 'mean')].values
+        neqr_stds = noise_grouped[('neqr_error_mean', 'std')].values
+        frqi_errors = noise_grouped[('frqi_error_mean', 'mean')].values
+        frqi_stds = noise_grouped[('frqi_error_mean', 'std')].values
+
+        ax.bar(x - width/2, neqr_errors, width,
+               yerr=neqr_stds,
                label='NEQR', color=IBM_COLORS['NEQR'], alpha=0.8, capsize=4)
 
-        ax.bar(x + width/2, noise_grouped[('frqi_error_mean', 'mean')], width,
-               yerr=noise_grouped[('frqi_error_mean', 'std')],
+        ax.bar(x + width/2, frqi_errors, width,
+               yerr=frqi_stds,
                label='FRQI', color=IBM_COLORS['FRQI'], alpha=0.8, capsize=4)
 
         apply_minimalistic_style(ax,
-                               title='Error by Noise Type',
+                               title='Error by Noise Configuration',
                                xlabel='Noise Configuration',
                                ylabel='Mean Absolute Error')
 
@@ -565,4 +578,86 @@ class QuantumDNAVisualizer:
         plt.tight_layout()
         plt.savefig('results/figures/noise_type_comparison.pdf',
                    dpi=CONFIG['figure_dpi'], bbox_inches='tight')
-        plt.show()
+        
+
+    @staticmethod
+    def plot_comprehensive_noise_analysis(results_df):
+        """Create comprehensive noise analysis visualization"""
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
+        
+        # Plot 1: Overall noise sensitivity
+        noise_summary = results_df.groupby('depolarizing_rate').agg({
+            'neqr_error_mean': 'mean',
+            'frqi_error_mean': 'mean'
+        })
+        
+        noise_rates = noise_summary.index
+        ax1.plot(noise_rates, noise_summary['neqr_error_mean'], 
+                marker='o', color=IBM_COLORS['NEQR'], label='NEQR', linewidth=2)
+        ax1.plot(noise_rates, noise_summary['frqi_error_mean'],
+                marker='s', color=IBM_COLORS['FRQI'], label='FRQI', linewidth=2)
+        
+        apply_minimalistic_style(ax1, title='Overall Noise Sensitivity',
+                               xlabel='Depolarizing Error Rate',
+                               ylabel='Mean Absolute Error')
+        ax1.set_xscale('log')
+        ax1.legend(frameon=False)
+        
+        # Plot 2: Noise impact by GC content
+        gc_noise_impact = results_df.groupby(['gc_content', 'depolarizing_rate']).agg({
+            'neqr_error_mean': 'mean'
+        }).unstack('depolarizing_rate')
+        
+        if len(gc_noise_impact) > 0:
+            gc_noise_impact.plot(kind='bar', ax=ax2, color=IBM_COLORS['NEQR'], alpha=0.7)
+            apply_minimalistic_style(ax2, title='NEQR Noise Impact by GC Content',
+                                   xlabel='GC Content',
+                                   ylabel='Error Rate')
+        
+        # Plot 3: Method comparison under noise
+        method_comparison = results_df[results_df['depolarizing_rate'] > 0].groupby('noise_config').agg({
+            'neqr_error_mean': 'mean',
+            'frqi_error_mean': 'mean'
+        })
+        
+        if len(method_comparison) > 0:
+            improvement = method_comparison['frqi_error_mean'] - method_comparison['neqr_error_mean']
+            bars = ax3.bar(range(len(improvement)), improvement, 
+                          color=[IBM_COLORS['Classical'] if x > 0 else IBM_COLORS['Error_Bars'] for x in improvement],
+                          alpha=0.8)
+            
+            apply_minimalistic_style(ax3, title='NEQR Advantage Under Noise',
+                                   xlabel='Noise Configuration',
+                                   ylabel='Error Difference (FRQI - NEQR)')
+            ax3.axhline(y=0, color='black', linestyle='-', linewidth=1)
+            ax3.set_xticks(range(len(improvement)))
+            ax3.set_xticklabels(method_comparison.index, rotation=45, ha='right')
+        
+        # Plot 4: Noise robustness metrics
+        no_noise = results_df[results_df['depolarizing_rate'] == 0]
+        high_noise = results_df[results_df['depolarizing_rate'] == results_df['depolarizing_rate'].max()]
+        
+        if len(no_noise) > 0 and len(high_noise) > 0:
+            neqr_degradation = (high_noise['neqr_error_mean'].mean() - no_noise['neqr_error_mean'].mean()) / no_noise['neqr_error_mean'].mean() * 100
+            frqi_degradation = (high_noise['frqi_error_mean'].mean() - no_noise['frqi_error_mean'].mean()) / no_noise['frqi_error_mean'].mean() * 100
+            
+            methods = ['NEQR', 'FRQI']
+            degradations = [neqr_degradation, frqi_degradation]
+            
+            bars = ax4.bar(methods, degradations, 
+                          color=[IBM_COLORS['NEQR'], IBM_COLORS['FRQI']], alpha=0.8)
+            
+            apply_minimalistic_style(ax4, title='Performance Degradation Under Noise',
+                                   xlabel='Method',
+                                   ylabel='Degradation (%)')
+            
+            # Add value labels on bars
+            for bar, val in zip(bars, degradations):
+                height = bar.get_height()
+                ax4.text(bar.get_x() + bar.get_width()/2., height + height*0.05,
+                        f'{val:.1f}%', ha='center', va='bottom')
+        
+        plt.tight_layout()
+        plt.savefig('results/figures/comprehensive_noise_analysis.pdf',
+                   dpi=CONFIG['figure_dpi'], bbox_inches='tight')
+        
