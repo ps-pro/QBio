@@ -72,12 +72,7 @@ class EnhancedScalingAnalysis:
                             hamming = EnhancedSequenceAnalyzer.calculate_hamming_similarity(seq1, seq2)
 
                             # Run quantum simulations
-                            neqr_trials = self.runner.run_multiple_trials_enhanced(
-                                seq1, seq2, 'neqr', n_trials
-                            )
-                            frqi_trials = self.runner.run_multiple_trials_enhanced(
-                                seq1, seq2, 'frqi', n_trials
-                            )
+                            neqr_trials, frqi_trials = self.runner.run_both_methods_parallel(seq1, seq2, n_trials)
 
                             # Create circuits to measure complexity
                             neqr_circuit = NEQREncoder().create_swap_test_circuit(seq1, seq2)

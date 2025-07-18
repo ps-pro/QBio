@@ -9,7 +9,9 @@ import matplotlib.pyplot as plt
 
 # CPU optimization settings
 CPU_COUNT = mp.cpu_count()
-MAX_WORKERS = min(CPU_COUNT, 8)
+MAX_WORKERS = CPU_COUNT  # ✅ USE ALL 16 CORES!
+print(f"💻 CPU Cores Available: {CPU_COUNT}")
+print(f"🔥 Max Workers: {MAX_WORKERS} (using ALL cores)")
 
 # ENHANCED CONFIGURATION
 CONFIG = {

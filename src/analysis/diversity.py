@@ -92,12 +92,7 @@ class EnhancedDiversityAnalysis:
                     complexity2 = EnhancedSequenceAnalyzer.calculate_sequence_complexity(seq2)
 
                     # Run quantum simulations
-                    neqr_scores = self.runner.run_multiple_trials_enhanced(
-                        seq1, seq2, 'neqr', n_trials
-                    )
-                    frqi_scores = self.runner.run_multiple_trials_enhanced(
-                        seq1, seq2, 'frqi', n_trials
-                    )
+                    neqr_scores, frqi_scores = self.runner.run_both_methods_parallel(seq1, seq2, n_trials)
 
                     # Calculate comprehensive statistics
                     neqr_stats = EnhancedStatisticalAnalysis.calculate_comprehensive_stats(neqr_scores)
