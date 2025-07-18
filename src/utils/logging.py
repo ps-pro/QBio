@@ -92,7 +92,7 @@ class ComprehensiveLogger:
         self.log_data['execution_time'] = str(datetime.now() - self.start_time)
 
         with open(f'results/logs/{filename}', 'w', encoding='utf-16') as f:
-            json.dump(self.log_data, f, indent=2, ensure_ascii=False)
+            json.dump(self.log_data, f, indent=2, ensure_ascii=False, default=str)
 
         print(f"📋 Comprehensive log saved to results/logs/{filename}")
 

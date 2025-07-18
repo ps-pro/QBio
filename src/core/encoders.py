@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Quantum DNA encoding implementations
+Quantum DNA encoding implementations - CORRECT for Qiskit 0.40
 """
 
 import numpy as np
@@ -20,7 +20,7 @@ class QuantumDNAEncoder:
         return mapping.get(nucleotide.upper(), 0)
 
 class NEQREncoder(QuantumDNAEncoder):
-    """Enhanced NEQR implementation"""
+    """Enhanced NEQR implementation - CORRECT for Qiskit 0.40"""
 
     def create_swap_test_circuit(self, seq1, seq2):
         L = len(seq1)
@@ -43,6 +43,7 @@ class NEQREncoder(QuantumDNAEncoder):
                 for j, bit in enumerate(pos_bin):
                     if bit == '0': qc_enc.x(pos_reg_inner[j])
 
+                # ✅ CORRECT: Use original mcx method for Qiskit 0.40
                 for j, bit in enumerate(nuc_bin):
                     if bit == '1': qc_enc.mcx(pos_reg_inner[:], val_reg_inner[j])
 
@@ -71,7 +72,7 @@ class NEQREncoder(QuantumDNAEncoder):
         return qc
 
 class FRQIEncoder(QuantumDNAEncoder):
-    """Enhanced FRQI implementation"""
+    """Enhanced FRQI implementation - CORRECT for Qiskit 0.40"""
 
     def create_comparison_circuit(self, seq1, seq2):
         L = len(seq1)
@@ -96,6 +97,8 @@ class FRQIEncoder(QuantumDNAEncoder):
             angle2 = self.nucleotide_to_angle(seq2[i])
 
             controls = [strip[0]] + list(idx[:])
+            
+            # ✅ CORRECT: Use original mcry method for Qiskit 0.40
             qc.x(strip[0])
             if angle1 != 0: qc.mcry(angle1, controls, dna[0])
             qc.x(strip[0])
